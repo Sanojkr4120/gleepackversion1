@@ -6,7 +6,9 @@ import crypto from 'crypto';
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback"
+    callbackURL: process.env.BACKEND_URL 
+      ? `${process.env.BACKEND_URL}/api/auth/google/callback` 
+      : "/api/auth/google/callback"
   },
   async function(accessToken, refreshToken, profile, done) {
     try {
