@@ -89,6 +89,10 @@ app.use("/api/areas", areaRoutes);
 app.use("/api/centers", centerRoutes);
 app.use("/api/pincodes", pincodeRoutes);
 
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
 // Error Handling Middleware
 app.use(notFound);
 app.use(errorHandler);
