@@ -38,7 +38,6 @@ const io = new Server(httpServer, {
 });
 
 import mongoSanitize from 'express-mongo-sanitize';
-import xss from 'xss-clean';
 import hpp from 'hpp';
 
 // Security & Performance Middleware
@@ -62,8 +61,7 @@ app.use(express.json());
 // Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-// Data Sanitization against XSS
-app.use(xss());
+// XSS Protection is handled by Helmet via Content-Security-Policy headers
 
 // Prevent Parameter Pollution
 app.use(hpp());
