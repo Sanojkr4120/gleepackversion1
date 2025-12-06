@@ -26,17 +26,40 @@ export const SystemProvider = ({ children }) => {
     useEffect(() => {
         fetchSettings();
 
-        // Initialize Socket.IO
-        const newSocket = io(import.meta.env.VITE_API_URL);
-        setSocket(newSocket);
+        // Initialize Socket.IO with error handling for Vercel
+        let newSocket = null;
+        try {
+            newSocket = io(import.meta.env.VITE_API_URL, {
+                transports: ['polling'], // Only use polling for Vercel compatibility
+                reconnectionAttempts: 3,
+                reconnectionDelay: 1000,
+                timeout: 10000,
+            });
 
-        newSocket.on('settingsUpdated', (updatedSettings) => {
-            setSettings(updatedSettings);
-        });
+            newSocket.on('connect', () => {
+                console.log('Socket connected');
+            });
+
+            newSocket.on('connect_error', (error) => {
+                console.warn('Socket connection failed (this is normal on Vercel):', error.message);
+            });
+
+            newSocket.on('settingsUpdated', (updatedSettings) => {
+                setSettings(updatedSettings);
+            });
+
+            setSocket(newSocket);
+        } catch (error) {
+            console.warn('Socket.IO initialization failed:', error);
+        }
 
         return () => {
-            newSocket.off('settingsUpdated');
-            newSocket.close();
+            if (newSocket) {
+                newSocket.off('settingsUpdated');
+                newSocket.off('connect');
+                newSocket.off('connect_error');
+                newSocket.close();
+            }
         };
     }, []);
 

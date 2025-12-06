@@ -22,19 +22,42 @@ import connectDB from './config/db.js';
 const app = express();
 const httpServer = createServer(app);
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  "http://localhost:5173",
-  "https://saharsafoodstestsecond.vercel.app",
-  "https://saharsafoodstestsecond-git-main-sk4120.vercel.app"
-];
+// Dynamic CORS - Allow all Vercel domains
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true; // Allow requests with no origin (mobile apps, Postman)
+  
+  const allowedList = [
+    process.env.FRONTEND_URL,
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:3000"
+  ];
+  
+  // Check exact matches
+  if (allowedList.includes(origin)) return true;
+  
+  // Allow ALL Vercel preview domains
+  if (origin.endsWith('.vercel.app')) return true;
+  
+  return false;
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+};
 
 const io = new Server(httpServer, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-  },
+  cors: corsOptions,
+  transports: ['polling'], // Only use polling for Vercel compatibility
 });
 
 import mongoSanitize from 'express-mongo-sanitize';
@@ -44,18 +67,7 @@ import hpp from 'hpp';
 app.use(helmet());
 app.use(compression()); // Compress all responses
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
-}));
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Data Sanitization against NoSQL query injection
