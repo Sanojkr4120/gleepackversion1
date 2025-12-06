@@ -1,93 +1,122 @@
-import "dotenv/config";
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import compression from "compression";
-import helmet from "helmet";
-import rateLimit from "express-rate-limit";
-import connectDB from "./config/db.js"; // Import cached connection logic
+import 'dotenv/config';
+import fs from 'fs';
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import compression from 'compression';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
+import hpp from 'hpp';
 
-import orderRoutes from "./routes/orderRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
-import menuRoutes from "./routes/menuRoutes.js";
-import areaRoutes from "./routes/areaRoutes.js";
-import centerRoutes from "./routes/centerRoutes.js";
-import pincodeRoutes from "./routes/pincodeRoutes.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import orderRoutes from './routes/orderRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import menuRoutes from './routes/menuRoutes.js';
+import areaRoutes from './routes/areaRoutes.js';
+import centerRoutes from './routes/centerRoutes.js';
+import pincodeRoutes from './routes/pincodeRoutes.js'; // Preserving existing functionality
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import connectDB from './config/db.js';
 
+const app = express();
+const httpServer = createServer(app);
+
+// Use one unified allowedOrigins list
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
+  "https://saharsafoods.vercel.app",
+  // Allow all vercel.app for previews (CORS fix)
+  /\.vercel\.app$/
 ];
 
-// Dynamic CORS Configuration
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Check if origin is in allowed list or matches Vercel preview URLs
-    if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-};
-
 const io = new Server(httpServer, {
-  cors: corsOptions,
-  transports: ['polling', 'websocket'],
-  path: '/socket.io/'
-});
-
-// Database Connection Middleware for Serverless
-app.use(async (req, res, next) => {
-  if (req.path.startsWith('/socket.io')) return next(); // Skip DB for socket handshake if preferred, but usually needed for session
-  try {
-    await connectDB();
-    next();
-  } catch (err) {
-    console.error("Database Connection Failed inside Middleware:", err);
-    res.status(500).json({ message: "Database Connection Error" });
-  }
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  },
+  transports: ['polling', 'websocket'] // Added polling support for Vercel
 });
 
 // Security & Performance Middleware
 app.use(helmet());
-app.use(compression());
-app.use(cors(corsOptions));
+app.use(compression()); // Compress all responses
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    
+    // Check against strings or regex
+    const isAllowed = allowedOrigins.some(o => {
+      if (o instanceof RegExp) return o.test(origin);
+      return o === origin;
+    });
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+}));
+
 app.use(express.json());
 
-// Explicitly handle Socket.IO polling requests for Serverless environment
-// Vercel only exports 'app', so we must route socket requests manually to the engine.
-app.all('/socket.io/*', (req, res) => {
-  io.engine.handleRequest(req, res);
-});
+// Data Sanitization against NoSQL query injection
+app.use(mongoSanitize());
 
-// Rate Limiting
+// Data Sanitization against XSS
+app.use(xss());
+
+// Prevent Parameter Pollution
+app.use(hpp());
+
+// Global Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 500, // Limit each IP to 500 requests per windowMs
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use("/api", limiter);
+app.use('/api', limiter);
 
-// Socket.IO Connection Handler
+// Strict Rate Limiting for Auth (Brute Force Protection)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 login/register attempts per 15 mins
+  message: 'Too many login attempts from this IP, please try again after 15 minutes',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/auth', authLimiter);
+
+// Socket.IO
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+    // console.log("User connected:", socket.id);
+  
+    socket.on("updateEmployeeLocation", (data) => {
+      // Broadcast location to all clients (admins/dashboards)
+      io.emit("employeeLocationUpdate", data);
+    });
+  
+    socket.on("disconnect", () => {
+      // User disconnected
+    });
+});
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
+// Explicitly handle Socket.IO polling requests for Serverless environment
+app.all('/socket.io/*', (req, res) => {
+    io.engine.handleRequest(req, res);
 });
 
 // Make io accessible in routes
@@ -96,19 +125,39 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/payment", paymentRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/menu", menuRoutes);
-app.use("/api/areas", areaRoutes);
-app.use("/api/centers", centerRoutes);
-app.use("/api/pincodes", pincodeRoutes);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/menu', menuRoutes);
+app.use('/api/areas', areaRoutes);
+app.use('/api/centers', centerRoutes);
+app.use('/api/pincodes', pincodeRoutes); // Added back your pincode routes
+
+// Serve Frontend in Production
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '../frontend/dist');
+
+  if (fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath));
+
+    app.get('*', (req, res) =>
+      res.sendFile(path.resolve(frontendPath, 'index.html'))
+    );
+  } else {
+    app.get('/', (req, res) => {
+      res.send('API is running....');
+    });
+  }
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running....');
+  });
+}
 
 // Error Handling Middleware
 app.use(notFound);
@@ -116,14 +165,13 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-if (process.env.VERCEL !== "1") {
-  // Only connect explicitly if not in serverless mode (serverless uses caching middleware)
+if (process.env.NODE_ENV !== 'production' && process.env.VERCEL !== '1') {
   connectDB().then(() => {
     httpServer.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
-  }).catch(err => {
-    console.error("Local DB Connect Error:", err);
+  }).catch((err) => {
+    console.error('Failed to connect to DB', err);
   });
 }
 
