@@ -18,6 +18,8 @@ import centerRoutes from './routes/centerRoutes.js';
 import pincodeRoutes from './routes/pincodeRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
+import passport from 'passport';
+import './config/passport.js';
 
 const app = express();
 app.set("trust proxy", 1); // Trust first proxy (Vercel Load Balancer)
@@ -70,6 +72,7 @@ app.use(compression()); // Compress all responses
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(passport.initialize());
 
 // Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());

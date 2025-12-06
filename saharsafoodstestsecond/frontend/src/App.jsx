@@ -15,6 +15,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import OAuthSuccess from './pages/OAuthSuccess';
 import { AuthProvider } from './context/AuthContext';
 import { SystemProvider } from './context/SystemContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:resettoken" element={<ResetPassword />} />
+                <Route path="/oauth-success" element={<OAuthSuccess />} />
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>

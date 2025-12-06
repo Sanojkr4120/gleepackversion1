@@ -245,4 +245,19 @@ const updateProfile = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, loginUser, getMe, forgotPassword, resetPassword, updatePassword, updateProfile };
+// @desc    Google Auth Callback
+// @route   GET /api/auth/google/callback
+// @access  Public
+const googleAuthCallback = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const token = generateToken(user.id, user.tokenVersion);
+  
+  // Calculate expiry date (30 days)
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Redirect to frontend with token
+  // Use /#/oauth-success for HashRouter
+  res.redirect(`${process.env.FRONTEND_URL}/#/oauth-success?token=${token}&expiresAt=${expiresAt}`);
+});
+
+export { registerUser, loginUser, getMe, forgotPassword, resetPassword, updatePassword, updateProfile, googleAuthCallback };

@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -85,6 +86,24 @@ const Login = () => {
                                     }`}
                             >
                                 {isSubmitting ? 'Logging in...' : 'Login'}
+                            </button>
+
+                            <div className="relative my-4">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-gray-600"></div>
+                                </div>
+                                <div className="relative flex justify-center text-sm">
+                                    <span className="px-2 bg-gray-800 text-gray-400">Or continue with</span>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`}
+                                className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-bold py-3 rounded-lg hover:bg-gray-100 transition"
+                            >
+                                <FcGoogle size={24} />
+                                <span>Login with Google</span>
                             </button>
                         </Form>
                     )}
