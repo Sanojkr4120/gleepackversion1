@@ -32,6 +32,9 @@ const httpServer = createServer(app);
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   "https://saharsafoods.vercel.app",
+  "https://saharsafoodstestsecond.vercel.app",
+  "https://saharsafoodstestsecond-git-main-sk4120.vercel.app",
+  "https://saharsafoodstestsecond-7648zhx0z-sk4120.vercel.app",
   // Allow all vercel.app for previews (CORS fix)
   /\.vercel\.app$/
 ];
@@ -138,26 +141,11 @@ app.use('/api/areas', areaRoutes);
 app.use('/api/centers', centerRoutes);
 app.use('/api/pincodes', pincodeRoutes); // Added back your pincode routes
 
-// Serve Frontend in Production
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../frontend/dist');
-
-  if (fs.existsSync(frontendPath)) {
-    app.use(express.static(frontendPath));
-
-    app.get('*', (req, res) =>
-      res.sendFile(path.resolve(frontendPath, 'index.html'))
-    );
-  } else {
-    app.get('/', (req, res) => {
-      res.send('API is running....');
-    });
-  }
-} else {
-  app.get('/', (req, res) => {
-    res.send('API is running....');
-  });
-}
+// Serve Frontend in Production: 
+// On Vercel, frontend is served separately. We only need a status check here.
+app.get('/', (req, res) => {
+  res.send('API is running....Server is Ready');
+});
 
 // Error Handling Middleware
 app.use(notFound);
