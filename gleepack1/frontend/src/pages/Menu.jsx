@@ -340,7 +340,7 @@ const Menu = () => {
                 <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="fixed top-20 right-8 z-50"
+                    className="fixed top-20 right-4 sm:right-8 z-50"
                 >
                     <button
                         onClick={proceedToCheckout}

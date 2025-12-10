@@ -264,7 +264,7 @@ const Home = () => {
             </motion.div>
 
             {/* Section 1: Hero Slider */}
-            <section className="relative h-[700px] lg:h-[800px] w-full overflow-hidden">
+            <section className="relative min-h-[400px] h-[80vh] sm:h-[600px] md:h-[700px] lg:h-[800px] max-h-[900px] w-full overflow-hidden">
                 <AnimatePresence mode='wait'>
                     <motion.div
                         key={currentSlide}
@@ -303,7 +303,7 @@ const Home = () => {
                                 initial={{ opacity: 0, y: 40 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3, duration: 0.8 }}
-                                className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight"
+                                className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight"
                             >
                                 <span className="bg-gradient-to-r from-white via-orange-200 to-orange-400 bg-clip-text text-transparent">
                                     {sliderImages[currentSlide].title}
@@ -315,7 +315,7 @@ const Home = () => {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.5, duration: 0.6 }}
-                                className="text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 leading-relaxed"
+                                className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 sm:mb-8 leading-relaxed"
                             >
                                 {sliderImages[currentSlide].subtitle}
                             </motion.p>
@@ -609,7 +609,7 @@ const Home = () => {
                             Subscribe to our newsletter and get exclusive discounts, new product alerts, and celebration tips delivered to your inbox.
                         </p>
 
-                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-xl mx-auto px-2 sm:px-0">
                             <input
                                 type="email"
                                 value={email}

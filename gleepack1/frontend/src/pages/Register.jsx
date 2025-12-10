@@ -37,7 +37,7 @@ const Register = () => {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-[70vh]">
+        <div className="flex justify-center items-center min-h-screen py-8 sm:py-12">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
