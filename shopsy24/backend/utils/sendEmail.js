@@ -10,7 +10,7 @@ const sendEmail = async (options) => {
   });
 
   const mailOptions = {
-    from: `"GleePack Support" <${process.env.EMAIL_USERNAME}>`,
+    from: `"ShopSy24 Support" <${process.env.EMAIL_USERNAME}>`,
     to: options.email,
     subject: options.subject,
     text: options.message,

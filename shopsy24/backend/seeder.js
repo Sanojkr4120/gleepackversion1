@@ -26,7 +26,7 @@ const createAdmin = async () => {
       password: hashedPassword,
       role: 'admin',
       phone: '9999999999',
-      address: 'GleePack HQ'
+      address: 'ShopSy24 HQ'
     });
 
     await adminUser.save();

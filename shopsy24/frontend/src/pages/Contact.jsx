@@ -11,7 +11,7 @@ const Contact = () => {
                 <div className="space-y-3 sm:space-y-4 text-left">
                     <p className="text-sm sm:text-base"><strong>📍 Address:</strong> Saharsa, Bihar, India</p>
                     <p className="text-sm sm:text-base"><strong>📞 Phone:</strong> <a href="tel:+919876543210" className="text-orange-400 hover:underline">+91 98765 43210</a></p>
-                    <p className="text-sm sm:text-base"><strong>📧 Email:</strong> <a href="mailto:hello@gleepack.com" className="text-orange-400 hover:underline">hello@gleepack.com</a></p>
+                    <p className="text-sm sm:text-base"><strong>📧 Email:</strong> <a href="mailto:hello@shopsy24.com" className="text-orange-400 hover:underline">hello@shopsy24.com</a></p>
                 </div>
             </div>
         </div>

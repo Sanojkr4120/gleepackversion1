@@ -19,7 +19,7 @@ const Navbar = () => {
       <nav className="bg-gray-800/50 backdrop-blur-md border-b border-gray-700 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-orange-500 tracking-tighter">
-            GleePack
+            ShopSy24
           </Link>
 
           <div className="hidden md:flex space-x-8 items-center">

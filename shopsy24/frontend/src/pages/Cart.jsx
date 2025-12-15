@@ -586,7 +586,7 @@ const Cart = () => {
                 key: initData.key,
                 amount: initData.amount,
                 currency: initData.currency,
-                name: "GleePack",
+                name: "ShopSy24",
                 description: "Order Payment",
                 order_id: initData.razorpayOrderId,
                 handler: async function (response) {

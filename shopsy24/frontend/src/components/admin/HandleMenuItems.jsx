@@ -14,7 +14,7 @@ const HandleMenuItems = () => {
         name: '',
         price: '',
         description: '',
-        category: 'Events',
+        category: 'Pillows',
         image: null,
         imageUrl: '',
         video: null,
@@ -295,9 +295,9 @@ const HandleMenuItems = () => {
                                         onChange={handleInputChange}
                                         className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white focus:border-orange-500 focus:outline-none"
                                     >
-                                        <option value="Birthday Party">Birthday Party</option>
-                                        <option value="Anniversary">Anniversary</option>
-                                        <option value="Grand Opening">Grand Opening</option>
+                                        <option value="Matrices">Matrices </option>
+                                        <option value="Premiums Pillow's">Premiums Pillow's </option>
+                                        <option value="Premiums Sleep Packages">Premiums Sleep Packages </option>
                                         <option value="Wedding">Wedding</option>
                                         <option value="Baby Shower">Baby Shower</option>
                                         <option value="Festivals">Festivals</option>
