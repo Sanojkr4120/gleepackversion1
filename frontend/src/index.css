@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+
+/* Material Symbols settings (आपके original में था) */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* original body min-height */
+body {
+  min-height: 100dvh;
+}
+
+@media (min-width: 768px) {
+  body {
+    min-height: max(884px, 100dvh);
+  }
+}
+
+/* Optional: font fallback if needed */
+html,
+body {
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* ===== MOBILE DEVICE COMPATIBILITY FIXES ===== */
+
+/* Safe area support for notched phones (iPhone X, 11, 12, 13, 14, 15, etc.) */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Smooth scrolling for better mobile experience */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Prevent horizontal overflow on all mobile devices */
+body {
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+}
+
+/* Fix for input zoom on iOS - prevents zooming when focusing on form inputs */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents iOS zoom on input focus */
+  }
+}
+
+/* Touch-friendly tap targets - minimum 44x44px recommended by Apple and Google */
+@media screen and (max-width: 768px) {
+  button,
+  a,
+  [role="button"],
+  .clickable {
+    min-height: 44px;
+  }
+}
+
+/* Improve touch scrolling performance */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for sticky elements on mobile Safari */
+@supports (-webkit-touch-callout: none) {
+  .sticky {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+}
+
+/* Better button active states for mobile */
+@media (hover: none) {
+  button:active,
+  a:active,
+  [role="button"]:active {
+    opacity: 0.8;
+  }
+}
+
+/* Prevent text selection on UI elements for better touch experience */
+nav,
+.nav-item,
+.btn,
+button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Smooth scroll snap for horizontal carousels */
+.snap-scroll {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-scroll > * {
+  scroll-snap-align: start;
+}
+
+/* Fix for 100vh issue on mobile browsers (address bar handling) */
+@supports (height: 100dvh) {
+  .min-h-screen-safe {
+    min-height: 100dvh;
+  }
+  .h-screen-safe {
+    height: 100dvh;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .min-h-screen-safe {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  .h-screen-safe {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+}
+
+/* Landscape mode handling for small phones */
+@media screen and (max-height: 450px) and (orientation: landscape) {
+  .hero-section {
+    min-height: 300px;
+  }
+  
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Fix for very small screens (320px - old iPhones, small Android phones) */
+@media screen and (max-width: 360px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Fix for foldable phones when folded */
+@media screen and (max-width: 280px) {
+  .container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
